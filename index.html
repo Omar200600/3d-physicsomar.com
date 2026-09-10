@@ -1,0 +1,2827 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head>
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصف الافتراضي للفيزياء ثلاثي الأبعاد - المدرس المساعد عمر حسان عبره</title>
+    <meta name="description" content="غرفة ثلاثية الأبعاد لصف مدرسي رخامي أنيق مع سبورة ذكية ومعلم فيزياء افتراضي بالذكاء الاصطناعي لطلاب المرحلة الثانوية">
+    <meta property="og:title" content="الصف الافتراضي للفيزياء ثلاثي الأبعاد - المدرس المساعد عمر حسان عبره">
+    <meta property="og:description" content="غرفة ثلاثية الأبعاد لصف مدرسي رخامي أنيق مع سبورة ذكية ومعلم فيزياء افتراضي بالذكاء الاصطناعي لطلاب المرحلة الثانوية">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <!-- Three.js 3D WebGL Library (Lightweight CDN for standalone zero-dependency execution) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+        <style>
+      /* --- Global Reset & Typography --- */
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      :root {
+        --bg-dark: #070b14;
+        --panel-bg: rgba(15, 23, 42, 0.94);
+        --panel-border: rgba(51, 65, 85, 0.65);
+        --accent-amber: #f59e0b;
+        --accent-emerald: #10b981;
+        --accent-blue: #38bdf8;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", "Tajawal", "Noto Sans Arabic", sans-serif;
+        --sidebar-width: 390px;
+      }
+
+      body, html {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        font-family: var(--font-family);
+        direction: rtl;
+        user-select: none;
+        -webkit-user-select: none;
+      }
+
+      /* Root Application Layout - Structured 3-Zone Flex Grid (Zero Overlap!) */
+      .app-layout {
+        display: flex;
+        flex-direction: column;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* --- ZONE 1: Top Bar Header (In-flow flex item) --- */
+      .top-bar {
+        position: relative;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.96);
+        border-bottom: 1px solid var(--panel-border);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+        flex-shrink: 0;
+      }
+
+      .header-left, .header-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .logo-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-left: 10px;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #1e3a8a, #0284c7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+      }
+
+      .logo-text h1 {
+        font-size: 15px;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.2;
+      }
+
+      .logo-text p {
+        font-size: 11px;
+        color: var(--text-muted);
+        line-height: 1.2;
+      }
+
+      .badge {
+        padding: 2px 7px;
+        border-radius: 9999px;
+        font-size: 10px;
+        font-weight: 700;
+      }
+
+      .badge-live {
+        background: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        animation: pulseLive 2s infinite;
+      }
+
+      @keyframes pulseLive {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(0.96); }
+      }
+
+      /* Grade Switcher Tabs */
+      .grade-switcher {
+        display: inline-flex;
+        background: rgba(30, 41, 59, 0.85);
+        padding: 3px;
+        border-radius: 12px;
+        border: 1px solid var(--panel-border);
+      }
+
+      .grade-pill {
+        background: transparent;
+        border: none;
+        color: #94a3b8;
+        padding: 5px 12px;
+        border-radius: 9px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .grade-pill:hover {
+        color: #fff;
+      }
+
+      .grade-pill.active {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #000;
+        box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+      }
+
+      /* Common Button & Utility Classes */
+      .glass-panel {
+        background: var(--panel-bg);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid var(--panel-border);
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: inherit;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        outline: none;
+        white-space: nowrap;
+      }
+
+      .btn:active {
+        transform: scale(0.96);
+      }
+
+      .btn-primary {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fde68a;
+        border-color: rgba(245, 158, 11, 0.4);
+      }
+
+      .btn-primary:hover {
+        background: rgba(245, 158, 11, 0.32);
+        border-color: #f59e0b;
+      }
+
+      .btn-emerald {
+        background: rgba(16, 185, 129, 0.2);
+        color: #6ee7b7;
+        border-color: rgba(16, 185, 129, 0.4);
+      }
+
+      .btn-emerald:hover, .btn-emerald.active {
+        background: rgba(16, 185, 129, 0.32);
+        border-color: #10b981;
+      }
+
+      .btn-ghost {
+        background: rgba(30, 41, 59, 0.6);
+        color: #cbd5e1;
+        border-color: var(--panel-border);
+      }
+
+      .btn-ghost:hover, .btn-ghost.active {
+        background: rgba(51, 65, 85, 0.8);
+        color: #fff;
+        border-color: #64748b;
+      }
+
+      .btn-icon {
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        font-size: 14px;
+      }
+
+      /* --- WORKSPACE CONTAINER (Holds ZONE 2 & ZONE 3 side-by-side in flow) --- */
+      .workspace-layout {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* --- ZONE 2: CENTER CANVAS AREA (Dedicated 3D Classroom View) --- */
+      .canvas-area {
+        flex: 1;
+        height: 100%;
+        min-width: 0;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      #classroom-canvas-container {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+        z-index: 1;
+      }
+
+      #classroom-canvas-container:active {
+        cursor: grabbing;
+      }
+
+      /* Floating Blackboard Announcement Banner (Contained inside Canvas Zone) */
+      #board-announcement-banner {
+        position: absolute;
+        top: 14px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-120%);
+        z-index: 15;
+        padding: 8px 18px;
+        border-radius: 14px;
+        border-color: rgba(245, 158, 11, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #board-announcement-banner.visible {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      /* Floating minimal quick camera bar (On canvas floor) */
+      .canvas-quick-bar {
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        z-index: 12;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--panel-border);
+      }
+
+      .preset-btn {
+        background: rgba(30, 41, 59, 0.7);
+        border: 1px solid var(--panel-border);
+        color: #cbd5e1;
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .preset-btn:hover {
+        background: rgba(51, 65, 85, 0.9);
+        color: #fff;
+      }
+
+      .preset-btn.active {
+        background: rgba(245, 158, 11, 0.25);
+        color: #fde68a;
+        border-color: #f59e0b;
+      }
+
+      /* Floating trigger button when sidebar is collapsed */
+      .floating-dock-trigger {
+        position: absolute;
+        bottom: 14px;
+        left: 14px;
+        z-index: 14;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fde68a;
+        background: rgba(15, 23, 42, 0.92);
+        border: 1px solid rgba(245, 158, 11, 0.5);
+        cursor: pointer;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(10px);
+      }
+
+      .floating-dock-trigger.visible {
+        display: inline-flex;
+      }
+
+      /* --- ZONE 3: DOCKING SIDEBAR (Docked clean panel without overlapping canvas) --- */
+      .docking-sidebar {
+        width: var(--sidebar-width);
+        flex-shrink: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: var(--panel-bg);
+        border-right: 1px solid var(--panel-border);
+        z-index: 20;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), margin-right 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s ease;
+        position: relative;
+      }
+
+      .docking-sidebar.collapsed {
+        margin-right: calc(-1 * var(--sidebar-width));
+        pointer-events: none;
+        visibility: hidden;
+      }
+
+      /* Tabs Header inside Docking Sidebar */
+      .sidebar-tabs-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 12px;
+        border-bottom: 1px solid var(--panel-border);
+        background: rgba(30, 41, 59, 0.4);
+        flex-shrink: 0;
+      }
+
+      .tabs-nav {
+        display: flex;
+        gap: 6px;
+      }
+
+      .tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: #94a3b8;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .tab-btn:hover {
+        color: #fff;
+        background: rgba(51, 65, 85, 0.4);
+      }
+
+      .tab-btn.active {
+        background: rgba(245, 158, 11, 0.2);
+        color: #fde68a;
+        border-color: rgba(245, 158, 11, 0.4);
+      }
+
+      /* Sidebar Tab Contents */
+      .sidebar-tab-content {
+        display: none;
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .sidebar-tab-content.active-tab {
+        display: flex;
+      }
+
+      /* Dialog Header inside Chat Tab */
+      .dialog-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--panel-border);
+        background: rgba(30, 41, 59, 0.3);
+        flex-shrink: 0;
+      }
+
+      .teacher-avatar-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .avatar-circle {
+        position: relative;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #1e40af, #2563eb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        border: 2px solid #60a5fa;
+      }
+
+      .speaking-pulse {
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid #38bdf8;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .speaking-pulse.active {
+        animation: pulseWave 1.4s infinite cubic-bezier(0, 0.2, 0.8, 1);
+        opacity: 1;
+      }
+
+      @keyframes pulseWave {
+        0% { transform: scale(0.9); opacity: 0.8; }
+        100% { transform: scale(1.4); opacity: 0; }
+      }
+
+      .dialog-header-info h2 {
+        font-size: 14px;
+        font-weight: 800;
+        color: #fff;
+        line-height: 1.2;
+      }
+
+      .dialog-header-info p {
+        font-size: 11px;
+        color: #38bdf8;
+        font-weight: 600;
+      }
+
+      /* Quick Topics Chips */
+      .quick-topics-container {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding: 8px 12px;
+        background: rgba(15, 23, 42, 0.4);
+        border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+        flex-shrink: 0;
+      }
+
+      .quick-topics-container::-webkit-scrollbar {
+        height: 4px;
+      }
+
+      .quick-topics-container::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
+
+      .topic-pill {
+        background: rgba(30, 41, 59, 0.8);
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        color: #cbd5e1;
+        padding: 4px 10px;
+        border-radius: 9999px;
+        font-size: 11px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .topic-pill:hover {
+        background: rgba(245, 158, 11, 0.2);
+        border-color: #f59e0b;
+        color: #fde68a;
+      }
+
+      /* Chat Messages Scrollable Area */
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 0;
+      }
+
+      .chat-messages::-webkit-scrollbar {
+        width: 5px;
+      }
+
+      .chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 4px;
+      }
+
+      .message-row {
+        display: flex;
+        flex-direction: column;
+        max-width: 88%;
+        animation: fadeInMsg 0.25s ease-out;
+      }
+
+      @keyframes fadeInMsg {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .message-row.teacher {
+        align-self: flex-start;
+      }
+
+      .message-row.user {
+        align-self: flex-end;
+      }
+
+      .message-bubble {
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 12.5px;
+        line-height: 1.55;
+        word-break: break-word;
+      }
+
+      .message-row.teacher .message-bubble {
+        background: rgba(30, 41, 59, 0.95);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        color: #f1f5f9;
+        border-top-right-radius: 4px;
+      }
+
+      .message-row.user .message-bubble {
+        background: linear-gradient(135deg, #0284c7, #0369a1);
+        color: #fff;
+        border-top-left-radius: 4px;
+      }
+
+      .message-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 5px;
+      }
+
+      .msg-action-btn {
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(71, 85, 105, 0.4);
+        color: #94a3b8;
+        padding: 3px 8px;
+        border-radius: 6px;
+        font-size: 10.5px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .msg-action-btn:hover {
+        background: rgba(56, 189, 248, 0.2);
+        color: #38bdf8;
+      }
+
+      /* Chat Input Bar */
+      .dialog-input-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 12px;
+        border-top: 1px solid var(--panel-border);
+        background: rgba(15, 23, 42, 0.85);
+        flex-shrink: 0;
+      }
+
+      .dialog-input {
+        flex: 1;
+        background: rgba(30, 41, 59, 0.85);
+        border: 1px solid var(--panel-border);
+        padding: 8px 12px;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 12.5px;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s ease;
+      }
+
+      .dialog-input:focus {
+        border-color: var(--accent-amber);
+      }
+
+      /* --- TAB 2: Navigation & D-Pad View --- */
+      .nav-panel-card {
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+        height: 100%;
+      }
+
+      .nav-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-card-title h3 {
+        font-size: 14px;
+        font-weight: 800;
+        color: #fff;
+      }
+
+      .nav-card-desc {
+        font-size: 11.5px;
+        color: var(--text-muted);
+        line-height: 1.4;
+      }
+
+      .dpad-container {
+        padding: 12px;
+        border-radius: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--panel-border);
+      }
+
+      .rot-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 8px;
+      }
+
+      .dpad-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 44px);
+        grid-template-rows: repeat(3, 44px);
+        gap: 6px;
+      }
+
+      .dpad-btn {
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(71, 85, 105, 0.6);
+        color: #f8fafc;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        user-select: none;
+        transition: all 0.15s ease;
+      }
+
+      .dpad-btn:hover {
+        background: rgba(51, 65, 85, 0.95);
+        border-color: #94a3b8;
+      }
+
+      .dpad-btn:active, .dpad-btn.pressed {
+        background: var(--accent-amber);
+        color: #000;
+        transform: scale(0.92);
+        box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+      }
+
+      .dpad-btn .key-hint {
+        font-size: 9px;
+        opacity: 0.65;
+        margin-top: -2px;
+      }
+
+      .dpad-center {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .dpad-center-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(245, 158, 11, 0.6);
+      }
+
+      /* Popups / Modals */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+
+      .modal-backdrop.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .modal-card {
+        width: 100%;
+        max-width: 620px;
+        border-radius: 18px;
+        overflow: hidden;
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+        animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      @keyframes scaleUp {
+        from { transform: scale(0.92); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background: rgba(30, 41, 59, 0.8);
+        border-bottom: 1px solid var(--panel-border);
+      }
+
+      .modal-body {
+        padding: 18px;
+        background: #0f241d;
+        color: #f1f5f9;
+        font-size: 13.5px;
+        line-height: 1.8;
+      }
+
+      .modal-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 18px;
+        background: rgba(15, 23, 42, 0.9);
+        border-top: 1px solid var(--panel-border);
+      }
+
+      /* Voice Listening Modal */
+      #voice-listening-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 110;
+        background: rgba(7, 11, 20, 0.92);
+        backdrop-filter: blur(12px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+
+      #voice-listening-modal.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .mic-wave-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        animation: pulseMic 1.5s infinite;
+      }
+
+      @keyframes pulseMic {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+        70% { transform: scale(1.1); box-shadow: 0 0 0 25px rgba(245, 158, 11, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      }
+
+      /* --- Responsive Breakpoints (Mobile & Touch Screen Optimization) --- */
+      @media (max-width: 900px) {
+        .workspace-layout {
+          flex-direction: column;
+        }
+
+        .canvas-area {
+          flex: 1;
+          min-height: 44vh;
+        }
+
+        .docking-sidebar {
+          width: 100%;
+          max-height: 48vh;
+          border-right: none;
+          border-top: 1px solid var(--panel-border);
+          box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        .docking-sidebar.collapsed {
+          margin-right: 0;
+          max-height: 0;
+          display: none;
+        }
+
+        .canvas-quick-bar {
+          bottom: 10px;
+          right: 10px;
+          padding: 4px 8px;
+        }
+
+        .preset-btn {
+          padding: 4px 8px;
+          font-size: 10px;
+        }
+
+        .floating-dock-trigger.visible {
+          display: inline-flex;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .top-bar {
+          padding: 6px 10px;
+          gap: 6px;
+        }
+
+        .logo-box {
+          padding-left: 6px;
+        }
+
+        .logo-icon {
+          width: 32px;
+          height: 32px;
+          font-size: 16px;
+        }
+
+        .logo-text h1 {
+          font-size: 13px;
+        }
+
+        .logo-text p {
+          display: none;
+        }
+
+        .grade-pill {
+          padding: 4px 8px;
+          font-size: 11px;
+        }
+
+        .btn {
+          padding: 5px 9px;
+          font-size: 11px;
+        }
+
+        .btn-icon {
+          width: 32px;
+          height: 32px;
+          font-size: 13px;
+        }
+
+        .docking-sidebar {
+          max-height: 52vh;
+        }
+      }
+    </style>
+  <script src="/_aistudio-iframe.js?v=2c34bde1"></script><script src="https://cdn.jsdelivr.net/npm/html2canvas-pro@2.0.4"></script><style>.aistudio-hover-highlight { box-shadow: inset 0 0 0 0.5px white, inset 0 0 0 1.5px rgba(128,128,128,0.6) !important; }.aistudio-active-highlight { outline: 2px solid #87a9ff !important; outline-offset: -2px !important; box-shadow: 0 0 0 0.5px rgba(0,0,0,0.3), inset 0 0 0 0.5px rgba(0,0,0,0.3) !important; }.aistudio-generating-blur { filter: blur(5px) grayscale(100%) brightness(28%) !important; transition: filter 0.3s ease; }#aistudio-focus-mode-tag { position: absolute; display: none; align-items: center; gap: 4px; background: #87a9ff; border-radius: 12px; z-index: 10000; padding: 8px; color: #32302c; font-family: Inter, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; line-height: 21px; pointer-events: none; }#aistudio-hover-mode-tag { position: absolute; display: none; align-items: center; gap: 4px; background: rgba(128,128,128,0.6); border-radius: 12px; z-index: 10000; padding: 8px; color: white; font-family: Inter, sans-serif; font-size: 14px; font-style: normal; font-weight: 500; line-height: 21px; pointer-events: none; }.aistudio-img-icon { display: none; vertical-align: middle; pointer-events: auto; cursor: pointer; }.aistudio-img-icon.visible { display: inline-flex; }#aistudio-focus-mode-tag .aistudio-img-icon { position: relative; width: 26px; height: 26px; background: #32302c; border-radius: 6px; margin: -4px -4px -4px 0; }#aistudio-focus-mode-tag .aistudio-img-icon::before { content: ""; position: absolute; top: 4px; left: 4px; width: 18px; height: 18px; background-color: white; -webkit-mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); mask-size: contain; mask-repeat: no-repeat; }#aistudio-hover-mode-tag .aistudio-img-icon { position: relative; width: 18px; height: 18px; margin-left: 4px; }#aistudio-hover-mode-tag .aistudio-img-icon::before { content: ""; position: absolute; top: 0; left: 0; width: 18px; height: 18px; background-color: white; -webkit-mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; mask-image: url("https://fonts.gstatic.com/s/i/short-term/release/googlesymbols/edit_fix_auto/default/24px.svg"); mask-size: contain; mask-repeat: no-repeat; }#aistudio-focus-mode-tag .aistudio-img-icon:hover, #aistudio-hover-mode-tag .aistudio-img-icon:hover { background: #424242 !important; }#aistudio-focus-mode-tag .aistudio-img-icon:active, #aistudio-hover-mode-tag .aistudio-img-icon:active { background: #393f51 !important; }</style></head>
+    <body>
+    <!-- Complete 3-Zone Root Layout -->
+    <div id="app-root" class="app-layout">
+      <!-- ZONE 1: TOP BAR (Flex Header in normal flow) -->
+      <header id="classroom-top-header" class="top-bar">
+        <div class="header-left">
+          <!-- Logo & Title -->
+          <div class="logo-box">
+            <div class="logo-icon">⚛️</div>
+            <div class="logo-text">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <h1>صف الفيزياء 3D</h1>
+                <span class="badge badge-live">مباشر</span>
+              </div>
+              <p>المدرس المساعد عمر حسان عبره • سبورة ذكية</p>
+            </div>
+          </div>
+
+          <!-- Grade Selector Tabs -->
+          <div class="grade-switcher" id="grade-switcher-container">
+            <button class="grade-pill active" data-grade="first" onclick="switchGrade('first')">أول ثانوي</button>
+            <button class="grade-pill" data-grade="second" onclick="switchGrade('second')">ثاني ثانوي</button>
+            <button class="grade-pill" data-grade="third" onclick="switchGrade('third')">ثالث ثانوي</button>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Play Welcome Voice -->
+          <button id="header-welcome-voice-btn" class="btn btn-emerald" onclick="toggleTeacherWelcomeSpeech()" title="الاستماع إلى صوت المعلم عمر حسان عبره الترحيبي">
+            <span id="welcome-voice-icon">▶</span>
+            <span id="welcome-voice-label">صوت المعلم 🎙️</span>
+          </button>
+
+          <!-- Ask via Voice Mic -->
+          <button class="btn btn-primary" onclick="openStudentMicModal()" title="اطرح سؤالك الفيزيائي بالمايكروفون">
+            <span>🎙️</span>
+            <span>اسأل بالمايك</span>
+          </button>
+
+          <!-- Inspect Blackboard -->
+          <button class="btn btn-ghost" onclick="openBoardModal()" title="تكبير وفحص السبورة الذكية والقوانين">
+            <span>📋</span>
+            <span>فحص السبورة</span>
+          </button>
+
+          <!-- Export / Download Single File HTML -->
+          <button class="btn btn-ghost" onclick="downloadStandaloneApp()" title="تحميل التطبيق كملف HTML مستقل كامل لا يحتاج إنترنت أو خادم">
+            <span>📥</span>
+            <span>تصدير HTML</span>
+          </button>
+
+          <!-- Ambient Sound Control -->
+          <button class="btn btn-ghost btn-icon" onclick="toggleAmbientAcoustics()" id="ambient-sound-btn" title="صوت بيئة الصف الفيزيائي والأجواء">
+            <span>🔔</span>
+          </button>
+
+          <!-- Toggle Immersive View -->
+          <button class="btn btn-ghost btn-icon" onclick="toggleImmersiveView()" id="immersive-toggle-btn" title="وضع الرؤية الكاملة">
+            <span>👁️</span>
+          </button>
+
+          <!-- Fullscreen -->
+          <button class="btn btn-ghost btn-icon" onclick="toggleFullscreen()" title="ملء الشاشة">
+            <span>⛶</span>
+          </button>
+
+          <!-- Toggle Docking Sidebar Panel (Chat & Controls) -->
+          <button class="btn btn-ghost" id="sidebar-toggle-btn" onclick="toggleSidebar()" title="إظهار / إخفاء لوحة الشرح والتحكم">
+            <span id="sidebar-toggle-icon">💬</span>
+            <span id="sidebar-toggle-label">لوحة الأستاذ</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN WORKSPACE: ZONE 2 (3D CANVAS) + ZONE 3 (DOCKING PANELS) -->
+      <div id="main-workspace" class="workspace-layout">
+        
+        <!-- ZONE 2: CENTER / MAIN CANVAS AREA (Dedicated viewing area) -->
+        <main id="canvas-area-wrapper" class="canvas-area">
+          <!-- 3D Three.js WebGL Classroom Canvas Mount -->
+          <div id="classroom-canvas-container" title="اسحب للتنقل والنظر في أرجاء الصف"><canvas width="720" height="886" style="display: block; width: 360px; height: 443px;"></canvas></div>
+
+          <!-- Floating Blackboard Update Announcement Banner -->
+          <div id="board-announcement-banner" class="glass-panel">
+            <span style="font-size: 20px;">⚡</span>
+            <div>
+              <div style="font-size: 11px; color: #f59e0b; font-weight: 700;">تم تحديث السبورة الذكية 3D:</div>
+              <div id="announcement-title" style="font-size: 13px; font-weight: 800; color: #fff;">قوانين الحركة والميكانيكا</div>
+            </div>
+            <button class="btn btn-ghost" onclick="openBoardModal()" style="padding: 4px 10px; font-size: 11px;">عرض السبورة</button>
+          </div>
+
+          <!-- Floating Minimal Camera Quick Jump Bar on Canvas -->
+          <div class="canvas-quick-bar glass-panel">
+            <button class="preset-btn active" id="preset-default" onclick="applyCameraPreset('default')">الصف العام</button>
+            <button class="preset-btn" id="preset-teacher" onclick="applyCameraPreset('teacher_close')">أمام المدرس</button>
+            <button class="preset-btn" id="preset-blackboard" onclick="applyCameraPreset('blackboard')">السبورة</button>
+            <button class="preset-btn" id="preset-front_seat" onclick="applyCameraPreset('front_seat')">المقعد الأمامي</button>
+          </div>
+
+          <!-- Mobile floating open-panel trigger when collapsed -->
+          <button id="floating-open-dock-btn" class="floating-dock-trigger glass-panel visible" onclick="toggleSidebar(true)" title="فتح لوحة المدرس والتحكم">
+            <span>👨‍🏫 اسأل الأستاذ عمر / تحكم 🎮</span>
+          </button>
+        </main>
+
+        <!-- ZONE 3: DOCKING PANEL (Clean, Tabbed or Collapsible side/bottom docking panel) -->
+        <aside id="docking-sidebar" class="docking-sidebar collapsed">
+          <!-- Docking Tabs Header -->
+          <div class="sidebar-tabs-header">
+            <div class="tabs-nav">
+              <button class="tab-btn" id="tab-btn-chat" onclick="switchSidebarTab('chat')">
+                <span>👨‍🏫</span>
+                <span>المحادثة والشرح</span>
+              </button>
+              <button class="tab-btn active" id="tab-btn-nav" onclick="switchSidebarTab('nav')">
+                <span>🎮</span>
+                <span>أزرار التجول</span>
+              </button>
+            </div>
+            <div class="tabs-actions">
+              <!-- Minimize/Collapse button -->
+              <button class="btn btn-ghost btn-icon" onclick="toggleSidebar(false)" title="تصغير / إخفاء اللوحة" style="width: 30px; height: 30px;">
+                <span>✕</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 1: TEACHER DIALOG / CHAT PANEL -->
+          <div id="teacher-dialog-panel" class="sidebar-tab-content">
+            <div class="dialog-header">
+              <div class="teacher-avatar-badge">
+                <div class="avatar-circle">
+                  <span>👨‍🏫</span>
+                  <div class="speaking-pulse" id="avatar-speaking-pulse"></div>
+                </div>
+                <div class="dialog-header-info">
+                  <h2>عمر حسان عبره</h2>
+                  <p id="teacher-status-subtitle">مدرس مساعد فيزياء بالذكاء الاصطناعي</p>
+                </div>
+              </div>
+              <div style="display: flex; gap: 4px;">
+                <button class="btn btn-ghost btn-icon" style="width: 32px; height: 32px;" onclick="toggleVoiceAudioMute()" id="mute-voice-btn" title="كتم/تفعيل صوت المعلم">🔊</button>
+                <button class="btn btn-ghost btn-icon" style="width: 32px; height: 32px;" onclick="togglePanelCollapse()" title="طي/توسيع المحتوى">↕</button>
+              </div>
+            </div>
+
+            <!-- Quick Topics Container -->
+            <div class="quick-topics-container" id="quick-topics-box"><button class="topic-pill">اشرح قانون نيوتن الثاني مع مسألة عملية</button><button class="topic-pill">ما هي معادلات الحركة بعجلة منتظمة؟</button><button class="topic-pill">كيف نحسب الشغل وطاقة الحركة؟</button><button class="topic-pill">ما الفرق بين الكمية القياسية والكمية المتجهة؟</button></div>
+
+            <!-- Chat Messages Area -->
+            <div class="chat-messages" id="chat-messages-container"><div class="message-row teacher"><div class="message-bubble">أهلاً بك يا بطل الفيزياء في الصف الافتراضي ثلاثي الأبعاد! أنا أستاذك عمر حسان عبره، تفضل بسؤالي عبر الكتابة أو المايكروفون، وسأشرح لك وأدوّن القوانين على السبورة الذكية أمامك مباشرة.</div><div class="message-actions"><button class="msg-action-btn">🔊 إعادة الاستماع</button><button class="msg-action-btn">📋 فحص السبورة</button></div></div></div>
+
+            <!-- Input Bar -->
+            <form class="dialog-input-bar" onsubmit="handleChatSubmit(event)">
+              <input type="text" id="chat-input-field" class="dialog-input" placeholder="اسأل الأستاذ عمر عن أي مفهوم أو قانون..." autocomplete="off">
+              <button type="button" class="btn btn-primary btn-icon" onclick="openStudentMicModal()" title="تحدث بصوتك">🎙️</button>
+              <button type="submit" class="btn btn-emerald btn-icon" title="إرسال">➤</button>
+            </form>
+          </div>
+
+          <!-- TAB 2: VISITOR NAVIGATION & D-PAD PANEL -->
+          <div id="visitor-navigation-overlay" class="sidebar-tab-content active-tab">
+            <div class="nav-panel-card">
+              <div class="nav-card-title">
+                <span>🎮</span>
+                <h3>أزرار التجول والتحكم في الصف</h3>
+              </div>
+              <p class="nav-card-desc">تحرك في أرجاء الصف الرخامي واقترب من المدرس أو السبورة:</p>
+
+              <!-- D-Pad Directional Arrows -->
+              <div class="dpad-container glass-panel">
+                <div class="rot-controls">
+                  <button class="dpad-btn" id="btn-rot-left" title="استدارة لليسار (Q)">↺ دوران يسار</button>
+                  <span style="font-size: 11px; font-weight: 700; color: #f59e0b;">تحرك وتجول</span>
+                  <button class="dpad-btn" id="btn-rot-right" title="استدارة لليمين (E)">دوران يمين ↻</button>
+                </div>
+
+                <div class="dpad-grid">
+                  <div></div>
+                  <button class="dpad-btn" id="btn-move-fwd" title="أمام (W أو ↑)">▲<span class="key-hint">W</span></button>
+                  <div></div>
+                  <button class="dpad-btn" id="btn-move-left" title="يسار (A أو ←)">►<span class="key-hint">A</span></button>
+                  <div class="dpad-center"><div class="dpad-center-dot"></div></div>
+                  <button class="dpad-btn" id="btn-move-right" title="يمين (D أو →)">◄<span class="key-hint">D</span></button>
+                  <div></div>
+                  <button class="dpad-btn" id="btn-move-back" title="خلف (S أو ↓)">▼<span class="key-hint">S</span></button>
+                  <div></div>
+                </div>
+                <div style="font-size: 10px; color: #94a3b8; text-align: center; margin-top: 4px;">يمكنك أيضاً استخدام مفاتيح W A S D أو الأسهم بلوحة المفاتيح</div>
+              </div>
+
+              <!-- Camera presets inside tab too -->
+              <div style="margin-top: 8px;">
+                <div style="font-size: 12px; font-weight: 700; color: #cbd5e1; margin-bottom: 6px;">🎥 زوايا الرؤية السريعة:</div>
+                <div class="camera-presets-bar glass-panel" style="display: flex; gap: 6px; flex-wrap: wrap; padding: 6px; border-radius: 10px;">
+                  <button class="preset-btn active" onclick="applyCameraPreset('default')">الصف العام</button>
+                  <button class="preset-btn" onclick="applyCameraPreset('teacher_close')">أمام المدرس</button>
+                  <button class="preset-btn" onclick="applyCameraPreset('blackboard')">السبورة</button>
+                  <button class="preset-btn" onclick="applyCameraPreset('front_seat')">المقعد الأمامي</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Blackboard Inspection Modal -->
+    <div id="blackboard-inspection-modal" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 24px;">📋</span>
+            <div>
+              <h3 id="modal-board-title" style="font-size: 16px; font-weight: 800; color: #fff;">قوانين نيوتن في الحركة والميكانيكا</h3>
+              <p id="modal-board-grade-subtitle" style="font-size: 11px; color: #f59e0b; font-weight: 700;">المرحلة الثانوية - الأستاذ عمر حسان عبره</p>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-icon" onclick="closeBoardModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+            <!-- Formula Box -->
+            <div style="background: rgba(30, 58, 138, 0.35); border: 2px solid #60a5fa; border-radius: 14px; padding: 14px; text-align: center;">
+              <div style="font-size: 13px; color: #93c5fd; font-weight: 700; margin-bottom: 8px;">⚡ القانون الفيزيائي الذهبي ⚡</div>
+              <div id="modal-board-formula" style="font-size: 22px; font-family: monospace; font-weight: 800; color: #fff; direction: ltr; margin: 10px 0;">F = m · a  |  W = F · d · cos(θ)</div>
+              <button class="btn btn-primary" onclick="copyFormulaToClipboard()" style="padding: 4px 10px; font-size: 11px;">نسخ القانون</button>
+            </div>
+
+            <!-- Bullet Points -->
+            <div>
+              <div style="font-size: 13px; color: #34d399; font-weight: 700; margin-bottom: 8px;">📌 ملخص شرح الأستاذ عمر حسان:</div>
+              <ul id="modal-board-points" style="list-style: none; display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.6;"><li>• قانون نيوتن الأول: الجسم الساكن يبقى ساكناً مالم تؤثر عليه قوة محصلة.</li><li>• قانون نيوتن الثاني: القوة المحصلة = الكتلة × التسارع (F = m · a).</li><li>• قانون نيوتن الثالث: لكل فعل رد فعل مساوٍ له في المقدار ومضاد في الاتجاه.</li><li>• وحدة القوة: النيوتن (N) = كجم · م / ث².</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeBoardModal()">إغلاق</button>
+          <button class="btn btn-emerald" onclick="openStudentMicModal()">🎙️ اسأل عن هذه السبورة</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student Mic Voice Listening Modal -->
+    <div id="voice-listening-modal">
+      <div class="mic-wave-circle">🎙️</div>
+      <h3 style="font-size: 20px; font-weight: 800; color: #fff;">الأستاذ عمر حسان يستمع إليك الآن...</h3>
+      <p style="font-size: 14px; color: #cbd5e1; max-width: 400px; text-align: center;">تفضل بطرح سؤالك بصوتك بوضوح وسيجيبك الأستاذ فوراً ويكتب القانون على السبورة</p>
+      <div id="student-live-transcript" style="font-size: 16px; color: #fde68a; font-weight: 700; min-height: 30px; text-align: center; padding: 0 20px;">(انتظار كلامك...)</div>
+      <button class="btn btn-ghost" onclick="closeStudentMicModal()" style="margin-top: 10px;">إلغاء والتحدث كتابياً</button>
+    </div>
+
+<script>
+      // ==========================================
+      // 1. STATE & CURRICULUM CONFIGURATION
+      // ==========================================
+      const state = {
+        currentGrade: 'first', // 'first', 'second', 'third'
+        isAiActive: true,
+        isTeacherTalking: false,
+        teacherGesture: 'welcoming', // 'welcoming', 'explaining', 'pointing_board', 'writing', 'idle'
+        isVoiceMuted: false,
+        cameraPreset: 'default',
+        isImmersiveView: false,
+        isPanelCollapsed: false,
+        blackboardData: {
+          title: 'قوانين نيوتن في الحركة والميكانيكا',
+          points: [
+            '• قانون نيوتن الأول: الجسم الساكن يبقى ساكناً مالم تؤثر عليه قوة محصلة.',
+            '• قانون نيوتن الثاني: القوة المحصلة = الكتلة × التسارع (F = m · a).',
+            '• قانون نيوتن الثالث: لكل فعل رد فعل مساوٍ له في المقدار ومضاد في الاتجاه.',
+            '• وحدة القوة: النيوتن (N) = كجم · م / ث².',
+          ],
+          formula: 'F = m · a  |  W = F · d · cos(θ)',
+          grade: 'first',
+        },
+        visitorAction: {
+          forward: false,
+          backward: false,
+          left: false,
+          right: false,
+          turnLeft: false,
+          turnRight: false,
+        },
+        chatHistory: []
+      };
+
+      // Presets of Secondary Physics Curriculums
+      const PHYSICS_TOPICS = {
+        first: {
+          name: 'الصف الأول الثانوي (الميكانيكا والحركة)',
+          topics: [
+            'اشرح قانون نيوتن الثاني مع مسألة عملية',
+            'ما هي معادلات الحركة بعجلة منتظمة؟',
+            'كيف نحسب الشغل وطاقة الحركة؟',
+            'ما الفرق بين الكمية القياسية والكمية المتجهة؟'
+          ]
+        },
+        second: {
+          name: 'الصف الثاني الثانوي (الموائع والضوء والموجات)',
+          topics: [
+            'اشرح قاعدة باسكال والمكبس الهيدروليكي',
+            'كيف يحدث انكسار الضوء وما هو قانون سنيل؟',
+            'ما هي خصائص الموجات الميكانيكية والكهرومغناطيسية؟',
+            'وضح معادلة برنولي لضغط وسرعة الموائع'
+          ]
+        },
+        third: {
+          name: 'الصف الثالث الثانوي (الكهرومغناطيسية وفيزياء الكم)',
+          topics: [
+            'اشرح قانون فاراداي وقاعدة لنز للحث',
+            'كيف نطبق قانوني كيرشوف في الدوائر المعقدة؟',
+            'ما هي الظاهرة الكهروضوئية وتفسير آينشتاين؟',
+            'ما معنى ازدواجية الموجة والجسيم وفرضية دي برولي؟'
+          ]
+        }
+      };
+
+      // Comprehensive Physics Knowledge Base for instant standalone replies
+      const CURATED_PHYSICS_KB = [
+        {
+          match: ['نيوتن', 'قوة', 'تسارع', 'عجلة', 'كتلة', 'قصور'],
+          title: 'قوانين نيوتن في الحركة والميكانيكا',
+          formula: 'F = m · a  |  F₁₂ = -F₂₁',
+          points: [
+            '• قانون نيوتن الثاني: القوة المحصلة المؤثرة = الكتلة × التسارع.',
+            '• وحدة القوة هي النيوتن (N) = 1 كجم · م / ث².',
+            '• القصور الذاتي: ميل الأجسام لمقاومة تغيير حالتها الحركية.',
+            '• قانون الفعل ورد الفعل: يحدثان معاً دائماً وعلى جسمين مختلفين.'
+          ],
+          reply: 'أهلاً بك يا بني في عالم الميكانيكا! قوانين نيوتن هي الأساس الراسخ لفهم كل حركة حولنا: الأول يخبرنا عن القصور الذاتي، والثاني يعطينا العلاقة الرياضية الذهبية F = m · a، والثالث يبين أن القوى توجد دائماً في أزواج متبادلة متساوية ومتعاكسة. انظر للسبورة فقد دونت لك القانون ووحدات القياس بالتفصيل!',
+          gesture: 'explaining'
+        },
+        {
+          match: ['شغل', 'طاقة', 'حركية', 'وضع', 'بقاء'],
+          title: 'الشغل والطاقة الميكانيكية وحفظ الطاقة',
+          formula: 'W = F · d · cos(θ)  |  KE = ½ · m · v²',
+          points: [
+            '• الشغل الميكانيكي: W = F · d · cos(θ) بوحدة الجول (J).',
+            '• طاقة الحركة: KE = ½ · m · v² تتناسب طردياً مع مربع السرعة.',
+            '• طاقة الوضع التثاقلية: PE = m · g · h تعتمد على الارتفاع والكتلة.',
+            '• مبدأ حفظ الطاقة: الطاقة الكلية الميكانيكية ثابتة في غياب الاحتكاك.'
+          ],
+          reply: 'سؤال رائع ومهم جداً! الشغل في الفيزياء لا يعني مجرد التعب بل هو حاصل ضرب القوة في الإزاحة في اتجاهها. وعندما تبذل شغلاً على جسم فإنك تزيد من طاقته الحركية أو طاقة وضعه التثاقلية، وتذكر دائماً أن الطاقة لا تفنى ولا تستحدث من العدم! تفقد السبورة للملاحظات.',
+          gesture: 'pointing_board'
+        },
+        {
+          match: ['معادلات', 'حركة', 'سقوط', 'مقذوف', 'سرعة'],
+          title: 'معادلات الحركة بعجلة منتظمة والسقوط الحر',
+          formula: 'vf = vi + a · t  |  d = vi · t + ½ · a · t²',
+          points: [
+            '• المعادلة الأولى: السرعة النهائية vf = vi + a · t.',
+            '• المعادلة الثانية: الإزاحة d = vi · t + ½ · a · t².',
+            '• المعادلة الثالثة: مربع السرعة vf² = vi² + 2 · a · d.',
+            '• السقوط الحر: الحركة تحت تأثير الجاذبية الأرضية وحدها (g ≈ 9.8 m/s²).'
+          ],
+          reply: 'ممتاز يا بطل! معادلات الحركة الثلاث بعجلة منتظمة هي المفتاح لحل أي مسألة سيارات أو قطارات أو مقذوفات. وفي حالة السقوط الحر، كل ما نفعله هو استبدال التسارع a بعجلة الجاذبية g، وإذا سقط الجسم من السكون تكون سرعته الابتدائية vi = 0. راجع السبورة لمطالعة الصيغ الثلاث!',
+          gesture: 'writing'
+        },
+        {
+          match: ['باسكال', 'مكبس', 'ضغط', 'موائع', 'برنولي', 'هيدروليك'],
+          title: 'قاعدة باسكال والمكبس الهيدروليكي',
+          formula: 'F₁ / A₁ = F₂ / A₂  |  P = ρ · g · h',
+          points: [
+            '• نص قاعدة باسكال: ينتقل الضغط في السوائل المحصورة بتمامه لكل أجزاء السائل.',
+            '• المكبس الهيدروليكي: وسيلة لمضاعفة القوة F₂ / F₁ = A₂ / A₁.',
+            '• الفائدة الآلية للمكبس: η = مساحة المقطع الكبير ÷ مساحة المقطع الصغير.',
+            '• ضغط باطن سائل: P = ρ · g · h (الكثافة × الجاذبية × العمق).'
+          ],
+          reply: 'يا له من تطبيق فيزيائي عبقري! قاعدة باسكال هي التي تجعل مهندساً يرفع سيارة تزن أطناناً بضغطة زر أو قدم على دواسة الفرامل. الضغط ينتقل دون نقص في السائل، وبالتالي قوة صغيرة على مساحة صغيرة تعطي قوة هائلة على مساحة كبيرة! انظر للسبورة لتشاهد قانون المكبس وضغط السوائل.',
+          gesture: 'explaining'
+        },
+        {
+          match: ['سنيل', 'انكسار', 'ضوء', 'عدسات', 'مرايا', 'انعكاس'],
+          title: 'انكسار الضوء وقانون سنيل للبصريات',
+          formula: 'n₁ · sin(θ₁) = n₂ · sin(θ₂)  |  n = c / v',
+          points: [
+            '• قانون سنيل للبصريات: n₁ · sin(θ₁) = n₂ · sin(θ₂).',
+            '• معامل الانكسار المطلق: n = c / v (سرعة الضوء في الفراغ ÷ سرعته في الوسط).',
+            '• الزاوية الحرجة للانعكاس الكلي: sin(θc) = n₂ / n₁ (حيث n₁ > n₂).',
+            '• التطبيقات المعاصرة: كابلات الألياف الضوئية للإنترنت السريع والمناظير.'
+          ],
+          reply: 'البصريات من أروع فروع الفيزياء! انكسار الضوء يحدث بسبب تغير سرعة الموجة الضوئية عند انتقالها بين وسطين شفافين مختلفين في الكثافة الضوئية. ويحكم ذلك قانون سنيل الشهير. وعندما يسقط الضوء بزاوية أكبر من الزاوية الحرجة يحدث الانعكاس الكلي الداخلي وهو سر نقل بيانات الإنترنت عبر الألياف الضوئية!',
+          gesture: 'pointing_board'
+        },
+        {
+          match: ['موج', 'صوت', 'تردد', 'طول موجي', 'اهتزاز'],
+          title: 'خصائص الموجات وسرعة انتشارها',
+          formula: 'v = λ · f  |  T = 1 / f',
+          points: [
+            '• معادلة انتشار الأمواج: v = λ · f (السرعة = الطول الموجي × التردد).',
+            '• الزمن الدوري والتردد: T = 1 / f (التردد يقاس بالهرتز Hz).',
+            '• الموجات المستعرضة: تتكون من قمم وقيعان وتكون عمودية على اتجاه الانتشار.',
+            '• الموجات الطولية: تتكون من تضاغطات وتخلخلات كأمواج الصوت في الهواء.'
+          ],
+          reply: 'أحسنت الاستفسار! الموجة هي اضطراب ينقل الطاقة دون نقل جزيئات الوسط. والقانون العام لجميع الأمواج صوتية كانت أو ضوئية أو زلزالية هو: السرعة v = الطول الموجي λ × التردد f. انظر للسبورة فقد دونت لك خصائصها!',
+          gesture: 'explaining'
+        },
+        {
+          match: ['أوم', 'مقاومة', 'جهد', 'تيار', 'دائرة', 'فولت'],
+          title: 'قانون أوم والدوائر الكهربائية المغلقة',
+          formula: 'V = I · R  |  I = VB / (R_eq + r)',
+          points: [
+            '• قانون أوم الأساسي: فرق الجهد = شدة التيار × المقاومة (V = I · R).',
+            '• قانون أوم للدائرة المغلقة: I = VB / (R_eq + r) مع المقاومة الداخلية r.',
+            '• توصيل المقاومات على التوالي: R_eq = R₁ + R₂ (للحصول على مقاومة أكبر).',
+            '• توصيل المقاومات على التوازي: 1/R_eq = 1/R₁ + 1/R₂ (لتجزئة التيار).'
+          ],
+          reply: 'مرحباً بمهندس المستقبل! قانون أوم هو نبض الدوائر الكهربائية، فرق الجهد V هو القوة الدافعة التي تدفع الإلكترونات، وشحنات التيار I تتدفق بينما تقاومها المادة بالمقاومة R. وفي الثانوية العامة لا تنسَ المقاومة الداخلية للبطارية r! انظر للسبورة فقد وضعت لك القوانين.',
+          gesture: 'pointing_board'
+        },
+        {
+          match: ['كيرشوف', 'عقدة', 'مسار', 'عروة'],
+          title: 'قوانين كيرشوف للدوائر المعقدة',
+          formula: 'Σ I_in = Σ I_out  |  Σ VB = Σ (I · R)',
+          points: [
+            '• قانون كيرشوف الأول (العقدة): مجموع التيارات الداخلة = الخارجة (حفظ الشحنة).',
+            '• قانون كيرشوف الثاني (المسار المغلق): Σ VB = Σ (I · R) (حفظ الطاقة).',
+            '• التطبيق: حل الشبكات الكهربية ذات المصادر المتعددة التي يتعذر تبسيطها.',
+            '• طريقة الحل: فرض اتجاهات للتيارات وتطبيق معادلتي العقدة والمسارات.'
+          ],
+          reply: 'مسائل كيرشوف تعتبر من أثقل وأمتع مسائل الصف الثالث الثانوي! عندما تجد بطاريات في أكثر من فرع لا يمكنك استخدام أوم العادي، فنلجأ لقانون كيرشوف الأول لحفظ الشحنة عند كل تفرع، وقانون كيرشوف الثاني لحفظ الطاقة عبر كل مسار مغلق. تفقد السبورة لمراجعة الصيغة!',
+          gesture: 'writing'
+        },
+        {
+          match: ['فاراداي', 'حث', 'لنز', 'دينامو', 'محول', 'مغناطيس'],
+          title: 'الحث الكهرومغناطيسي وقانون فاراداي ولنز',
+          formula: 'emf = -N · (ΔΦ / Δt)  |  Φ = B · A · cos(θ)',
+          points: [
+            '• قانون فاراداي للحث: emf = -N · (ΔΦ / Δt) بالـ فولت (V).',
+            '• الفيض المغناطيسي: Φ = B · A · cos(θ) بوحدة الويبر (Wb).',
+            '• قاعدة لنز: الإشارة السالبة تدل على أن التيار المستحث يقاوم التغير المسبب له.',
+            '• مولد التيار (الدينامو): emf = N · B · A · ω · sin(ω · t).'
+          ],
+          reply: 'هذا هو المبدأ الذي أضاء العالم بأسره! مايكل فاراداي اكتشف أنه إذا قطع موصل خطوط فيض مغناطيسي متغير تتولد فيه قوة دافعة كهربائية مستحثة. وقاعدة لنز تؤكد أن هذا التيار يقاوم الحركة المسببة له. من هذا المبدأ تعمل محطات الكهرباء والمولدات! طالع السبورة للأهمية.',
+          gesture: 'pointing_board'
+        },
+        {
+          match: ['كهروضوئ', 'كم', 'فوتون', 'آينشتاين', 'بلانك', 'دي برولي', 'ذرية'],
+          title: 'الفيزياء الحديثة والظاهرة الكهروضوئية',
+          formula: 'E = h · ν = W + KE_max  |  λ = h / (m · v)',
+          points: [
+            '• كمّات الطاقة (الفوتونات): طاقة الفوتون E = h · ν (حيث h ثابت بلانك).',
+            '• معادلة آينشتاين الكهروضوئية: تحرير الإلكترون يتطلب طاقة أكبر من دالة الشغل W.',
+            '• دالة الشغل: أقل طاقة لازمة لانتزاع إلكترون دون إكسابه طاقة حركة.',
+            '• ازدواجية دي برولي: أي جسيم مادي متحرك تصاحبه موجة طولها λ = h / p.'
+          ],
+          reply: 'أهلاً بك في قمة الفيزياء الحديثة! آينشتاين حاز جائزة نوبل ليس على النسبية بل لتفسيره الظاهرة الكهروضوئية، حيث برهن أن الضوء يسلك سلوك جسيمات صغيرة تسمى الفوتونات، وعندما يصطدم فوتون طاقته كافية بإلكترون في سطح فلز يحرره فوراً! انظر للسبورة لتشاهد معادلة آينشتاين وفرضية دي برولي!',
+          gesture: 'explaining'
+        }
+      ];
+
+      // ==========================================
+      // 2. SYNTHESIZED WEB AUDIO ACOUSTICS (0 External Files)
+      // ==========================================
+      let audioCtx = null;
+      function getAudioContext() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume().catch(() => {});
+        }
+        return audioCtx;
+      }
+
+      function playSoundChime(type) {
+        try {
+          const ctx = getAudioContext();
+          if (!ctx) return;
+
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          if (type === 'welcome') {
+            // Harmonic chime chord for teacher entrance
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(523.25, now); // C5
+            osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.12); // E5
+            osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.25); // G5
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.6);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.6);
+          } else if (type === 'board_update') {
+            // Chalk writing chime
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(587.33, now);
+            osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.35);
+          } else if (type === 'click') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(440, now);
+            gain.gain.setValueAtTime(0.05, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + 0.08);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.08);
+          }
+        } catch (e) {
+          console.warn("Audio chime note:", e);
+        }
+      }
+
+      // Ambient Classroom Acoustics Synthesizer (Zero MP3 files)
+      let ambientNoiseNode = null;
+      let isAmbientActive = false;
+      function toggleAmbientAcoustics() {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+
+        if (isAmbientActive) {
+          if (ambientNoiseNode) {
+            try { ambientNoiseNode.stop(); } catch(e) {}
+            ambientNoiseNode = null;
+          }
+          isAmbientActive = false;
+          document.getElementById('ambient-sound-btn').style.background = '';
+          return;
+        }
+
+        try {
+          // Create soft pink/brown noise for large luxury room acoustics
+          const bufferSize = ctx.sampleRate * 2;
+          const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const output = noiseBuffer.getChannelData(0);
+          let b0 = 0, b1 = 0, b2 = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99 * b0 + white * 0.05;
+            b1 = 0.96 * b1 + white * 0.08;
+            b2 = 0.86 * b2 + white * 0.15;
+            output[i] = (b0 + b1 + b2) * 0.15;
+          }
+
+          const whiteNoise = ctx.createBufferSource();
+          whiteNoise.buffer = noiseBuffer;
+          whiteNoise.loop = true;
+
+          // Soft lowpass filter to make it gentle classroom air hum
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(320, ctx.currentTime);
+
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.025, ctx.currentTime);
+
+          whiteNoise.connect(filter);
+          filter.connect(gain);
+          gain.connect(ctx.destination);
+
+          whiteNoise.start();
+          ambientNoiseNode = whiteNoise;
+          isAmbientActive = true;
+          document.getElementById('ambient-sound-btn').style.background = 'rgba(16, 185, 129, 0.3)';
+        } catch (err) {
+          console.warn('Ambient acoustics init note:', err);
+        }
+      }
+
+      // ==========================================
+      // 3. ARABIC SPEECH SYNTHESIS & RECOGNITION (Web Speech API)
+      // ==========================================
+      let arabicVoice = null;
+      function scanArabicVoice() {
+        if ('speechSynthesis' in window) {
+          const voices = window.speechSynthesis.getVoices();
+          arabicVoice = voices.find(v => v.lang.startsWith('ar') && (v.name.includes('Maged') || v.name.includes('Tarik') || v.name.includes('Male')))
+            || voices.find(v => v.lang.startsWith('ar-SA') || v.lang.startsWith('ar-EG') || v.lang.startsWith('ar'))
+            || null;
+        }
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = scanArabicVoice;
+        scanArabicVoice();
+      }
+
+      function speakTeacherText(text, callback) {
+        if (state.isVoiceMuted || !('speechSynthesis' in window)) {
+          if (callback) callback();
+          return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        const clean = text.replace(/[*#_`~=+\-]/g, ' ').replace(/\s+/g, ' ').trim();
+        const utterance = new SpeechSynthesisUtterance(clean.slice(0, 360));
+        utterance.lang = 'ar-SA';
+        utterance.rate = 0.95;
+        utterance.pitch = 0.98;
+
+        if (arabicVoice) utterance.voice = arabicVoice;
+        else scanArabicVoice();
+
+        utterance.onstart = () => {
+          setTeacherTalking(true);
+        };
+        utterance.onend = () => {
+          setTeacherTalking(false);
+          if (callback) callback();
+        };
+        utterance.onerror = () => {
+          setTeacherTalking(false);
+          if (callback) callback();
+        };
+
+        try {
+          window.speechSynthesis.speak(utterance);
+        } catch(e) {
+          setTeacherTalking(false);
+          if (callback) callback();
+        }
+      }
+
+      function stopTeacherSpeech() {
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+        }
+        setTeacherTalking(false);
+      }
+
+      function setTeacherTalking(talking) {
+        state.isTeacherTalking = talking;
+        const pulse = document.getElementById('avatar-speaking-pulse');
+        if (pulse) {
+          if (talking) pulse.classList.add('active');
+          else pulse.classList.remove('active');
+        }
+      }
+
+      function toggleVoiceAudioMute() {
+        state.isVoiceMuted = !state.isVoiceMuted;
+        const btn = document.getElementById('mute-voice-btn');
+        if (state.isVoiceMuted) {
+          stopTeacherSpeech();
+          btn.innerHTML = '🔇';
+          btn.style.color = '#ef4444';
+        } else {
+          btn.innerHTML = '🔊';
+          btn.style.color = '';
+        }
+      }
+
+      let isWelcomeAudioPlaying = false;
+      function toggleTeacherWelcomeSpeech() {
+        if (isWelcomeAudioPlaying) {
+          stopTeacherSpeech();
+          isWelcomeAudioPlaying = false;
+          updateWelcomeBtn(false);
+          return;
+        }
+
+        getAudioContext();
+        playSoundChime('welcome');
+        state.teacherGesture = 'welcoming';
+
+        const gradeName = state.currentGrade === 'first' ? 'الصف الأول الثانوي'
+          : state.currentGrade === 'second' ? 'الصف الثاني الثانوي' : 'الصف الثالث الثانوي';
+
+        const text = `مرحباً بك يا بطل الفيزياء في الصف الافتراضي ثلاثي الأبعاد! أنا أستاذك ومدرسك المساعد عمر حسان عبره، أرحب بك بحرارة. نحن هنا معاً لتبسيط وفهم منهج فيزياء ${gradeName}، مع تجارب وحسابات تفاعلية وشرح حي على السبورة الذكية. يمكنك سؤالي والتحدث معي في أي وقت، وسأكون سعيداً بإجابتك فوراً بصوتي!`;
+
+        isWelcomeAudioPlaying = true;
+        updateWelcomeBtn(true);
+
+        speakTeacherText(text, () => {
+          isWelcomeAudioPlaying = false;
+          updateWelcomeBtn(false);
+          state.teacherGesture = 'explaining';
+        });
+      }
+
+      function updateWelcomeBtn(playing) {
+        const btn = document.getElementById('header-welcome-voice-btn');
+        const icon = document.getElementById('welcome-voice-icon');
+        const label = document.getElementById('welcome-voice-label');
+        if (playing) {
+          btn.classList.add('active');
+          icon.textContent = '⏹';
+          label.textContent = 'إيقاف صوت المعلم';
+        } else {
+          btn.classList.remove('active');
+          icon.textContent = '▶';
+          label.textContent = 'صوت المعلم 🎙️';
+        }
+      }
+
+      // Web Speech API Student Recognition
+      let speechRecognitionInstance = null;
+      function openStudentMicModal() {
+        const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRec) {
+          alert('ميزة التعرف على الصوت غير مدعومة في متصفحك الحالي، يمكنك استخدام الكتابة في المربع النصي.');
+          return;
+        }
+
+        document.getElementById('voice-listening-modal').classList.add('open');
+        document.getElementById('student-live-transcript').textContent = '(تحدث الآن... الأستاذ يستمع إليك)';
+
+        try {
+          speechRecognitionInstance = new SpeechRec();
+          speechRecognitionInstance.lang = 'ar-SA';
+          speechRecognitionInstance.continuous = false;
+          speechRecognitionInstance.interimResults = true;
+
+          speechRecognitionInstance.onresult = (event) => {
+            const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+            document.getElementById('student-live-transcript').textContent = `"${transcript}"`;
+            if (event.results[0].isFinal) {
+              setTimeout(() => {
+                closeStudentMicModal();
+                processStudentQuery(transcript);
+              }, 800);
+            }
+          };
+
+          speechRecognitionInstance.onerror = () => {
+            document.getElementById('student-live-transcript').textContent = 'لم يتم التقاط الصوت، يمكنك المحاولة ثانية أو الكتابة.';
+          };
+
+          speechRecognitionInstance.start();
+        } catch(e) {
+          console.warn("SpeechRec error:", e);
+        }
+      }
+
+      function closeStudentMicModal() {
+        document.getElementById('voice-listening-modal').classList.remove('open');
+        if (speechRecognitionInstance) {
+          try { speechRecognitionInstance.stop(); } catch(e){}
+          speechRecognitionInstance = null;
+        }
+      }
+
+      // ==========================================
+      // 4. PROCEDURAL MARBLE TEXTURES FOR 3D CLASSROOM
+      // ==========================================
+      function createMarbleFloorCanvas() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+
+        // Luxury polished light marble base
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, '#f8f9fa');
+        grad.addColorStop(0.5, '#f1f3f5');
+        grad.addColorStop(1, '#e9ecef');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        // Marble veins
+        const veinColors = [
+          'rgba(180, 190, 200, 0.28)',
+          'rgba(215, 195, 160, 0.22)',
+          'rgba(140, 150, 165, 0.20)',
+          'rgba(225, 230, 235, 0.55)'
+        ];
+
+        for (let i = 0; i < 36; i++) {
+          ctx.strokeStyle = veinColors[i % veinColors.length];
+          ctx.lineWidth = Math.random() * 8 + 2;
+          ctx.beginPath();
+          let x = Math.random() * 1024;
+          let y = Math.random() * 1024;
+          ctx.moveTo(x, y);
+
+          for (let step = 0; step < 5; step++) {
+            const cx = x + (Math.random() - 0.5) * 300;
+            const cy = y + (Math.random() - 0.5) * 300;
+            x += (Math.random() - 0.5) * 400;
+            y += (Math.random() - 0.5) * 400;
+            ctx.quadraticCurveTo(cx, cy, x, y);
+          }
+          ctx.stroke();
+        }
+
+        // Luxury large marble slab seams
+        ctx.strokeStyle = 'rgba(160, 170, 180, 0.45)';
+        ctx.lineWidth = 2;
+        for (let x = 0; x <= 1024; x += 256) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1024); ctx.stroke();
+        }
+        for (let y = 0; y <= 1024; y += 256) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1024, y); ctx.stroke();
+        }
+
+        return canvas;
+      }
+
+      function createMarbleWallCanvas() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1024;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+
+        // Bright pearl ivory marble wall
+        const grad = ctx.createLinearGradient(0, 0, 1024, 1024);
+        grad.addColorStop(0, '#fdfbf7');
+        grad.addColorStop(0.5, '#f7f4ed');
+        grad.addColorStop(1, '#f3efe6');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        ctx.strokeStyle = 'rgba(215, 195, 175, 0.22)';
+        ctx.lineWidth = 6;
+        for (let i = 0; i < 20; i++) {
+          ctx.beginPath();
+          let x = (i * 60) % 1024;
+          let y = 0;
+          ctx.moveTo(x, y);
+          while (y < 1024) {
+            x += Math.sin(y * 0.02) * 40;
+            y += 70;
+            ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+
+        // Wall Panel Molding
+        ctx.strokeStyle = 'rgba(210, 200, 190, 0.3)';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(30, 30, 964, 964);
+        ctx.strokeRect(50, 50, 924, 924);
+
+        return canvas;
+      }
+
+      function createWindowSkyCanvas() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, 512);
+        skyGrad.addColorStop(0, '#60a5fa');
+        skyGrad.addColorStop(0.65, '#93c5fd');
+        skyGrad.addColorStop(0.88, '#dbeafe');
+        skyGrad.addColorStop(1, '#86efac');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, 512, 512);
+
+        // Fluffy clouds
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        for (let i = 0; i < 4; i++) {
+          const cx = 90 + i * 110;
+          const cy = 110 + (i % 2) * 40;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+          ctx.arc(cx + 25, cy - 10, 30, 0, Math.PI * 2);
+          ctx.arc(cx + 45, cy, 25, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        return canvas;
+      }
+
+      // ==========================================
+      // 5. REAL-TIME 3D BLACKBOARD CANVAS RENDERER
+      // ==========================================
+      let blackboardCanvas = null;
+      let blackboardTexture = null;
+
+      function renderBlackboardCanvas(data) {
+        if (!blackboardCanvas) {
+          blackboardCanvas = document.createElement('canvas');
+          blackboardCanvas.width = 2048;
+          blackboardCanvas.height = 1024;
+        }
+
+        const ctx = blackboardCanvas.getContext('2d');
+
+        // Dark green chalk slate
+        const grad = ctx.createLinearGradient(0, 0, 2048, 1024);
+        grad.addColorStop(0, '#0f241d');
+        grad.addColorStop(0.5, '#132e26');
+        grad.addColorStop(1, '#0e201a');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 2048, 1024);
+
+        // Subtle chalk dust smudges
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
+        for (let i = 0; i < 50; i++) {
+          ctx.beginPath();
+          ctx.arc(Math.random() * 2048, Math.random() * 1024, Math.random() * 120 + 20, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Top Subject Header Bar
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+        ctx.fillRect(40, 40, 1968, 120);
+
+        ctx.fillStyle = '#34d399';
+        ctx.font = 'bold 44px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText('مادة الفيزياء - المرحلة الثانوية', 1960, 115);
+
+        ctx.fillStyle = '#a7f3d0';
+        ctx.font = '32px sans-serif';
+        ctx.textAlign = 'left';
+        const gradeName = data.grade === 'first' ? 'الصف الأول الثانوي (الميكانيكا)'
+          : data.grade === 'second' ? 'الصف الثاني الثانوي (الموائع والموجات)' : 'الصف الثالث الثانوي (الكهرومغناطيسية والكم)';
+        ctx.fillText(gradeName, 60, 115);
+
+        // Lesson Title in Yellow Chalk
+        ctx.fillStyle = '#fef08a';
+        ctx.font = 'bold 64px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(data.title, 1024, 250);
+
+        // Chalk Line
+        ctx.strokeStyle = 'rgba(254, 240, 138, 0.4)';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(300, 280);
+        ctx.lineTo(1748, 280);
+        ctx.stroke();
+
+        // Left Column: Formula Box
+        ctx.fillStyle = 'rgba(30, 58, 138, 0.3)';
+        ctx.strokeStyle = '#60a5fa';
+        ctx.lineWidth = 3;
+        if (ctx.roundRect) ctx.roundRect(100, 330, 800, 380, [16]);
+        else ctx.rect(100, 330, 800, 380);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#93c5fd';
+        ctx.font = 'bold 36px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ القانون الفيزيائي الذهبي ⚡', 500, 390);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 52px monospace';
+        ctx.fillText(data.formula, 500, 490);
+
+        // Diagram Sine Wave in formula box
+        ctx.strokeStyle = 'rgba(96, 165, 250, 0.6)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let x = 180; x <= 820; x += 10) {
+          const y = 610 + Math.sin((x - 180) * 0.04) * 35;
+          if (x === 180) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Right Column: Lesson Points
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#f8fafc';
+        data.points.forEach((pt, index) => {
+          ctx.font = '38px sans-serif';
+          ctx.fillText(pt, 1940, 380 + index * 85);
+        });
+
+        // Bottom Footer Notes
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+        ctx.font = '30px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✨ تحدث مع الأستاذ عمر حسان عبره لشرح أي مسألة وتحديث السبورة فوراً ✨', 1024, 940);
+
+        if (blackboardTexture) {
+          blackboardTexture.needsUpdate = true;
+        }
+
+        // Update modal as well
+        document.getElementById('modal-board-title').textContent = data.title;
+        document.getElementById('modal-board-formula').textContent = data.formula;
+        const ul = document.getElementById('modal-board-points');
+        ul.innerHTML = '';
+        data.points.forEach(p => {
+          const li = document.createElement('li');
+          li.textContent = p;
+          ul.appendChild(li);
+        });
+      }
+
+      // ==========================================
+      // 6. THREE.JS 3D CLASSROOM ENGINE
+      // ==========================================
+      let scene, camera, renderer;
+      let avatarRefs = {};
+      let studentDesksGroup;
+      let balls = [];
+
+      const visitorPos = {
+        x: 0,
+        y: 1.65,
+        z: 4.8,
+        rotY: 0,
+        targetX: 0,
+        targetZ: 4.8,
+        targetRotY: 0
+      };
+
+      function init3DClassroom() {
+        const container = document.getElementById('classroom-canvas-container');
+        if (!container) return;
+
+        // Scene
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color('#f0f4f8');
+        scene.fog = new THREE.FogExp2('#eef2f6', 0.02);
+
+        // Camera
+        camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.set(0, 1.65, 4.8);
+
+        // Renderer
+        renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1;
+        container.appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight('#ffffff', 0.85);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight('#fffbeb', 1.3);
+        sunLight.position.set(12, 10, 2);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        scene.add(sunLight);
+
+        const boardSpot = new THREE.SpotLight('#ffffff', 1.8, 16, Math.PI / 4, 0.4, 1);
+        boardSpot.position.set(0, 4.2, -3);
+        boardSpot.target.position.set(0, 2.2, -6.8);
+        scene.add(boardSpot);
+        scene.add(boardSpot.target);
+
+        // Room Dimensions
+        const roomW = 14, roomL = 18, roomH = 4.8;
+
+        // 1. Luxury Polished Marble Floor
+        const floorTex = new THREE.CanvasTexture(createMarbleFloorCanvas());
+        floorTex.wrapS = THREE.RepeatWrapping;
+        floorTex.wrapT = THREE.RepeatWrapping;
+        floorTex.repeat.set(4, 4);
+
+        const floorMat = new THREE.MeshStandardMaterial({ map: floorTex, roughness: 0.15, metalness: 0.08 });
+        const floor = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomL), floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+
+        // 2. Light Bright Marble Walls
+        const wallTex = new THREE.CanvasTexture(createMarbleWallCanvas());
+        wallTex.wrapS = THREE.RepeatWrapping;
+        wallTex.wrapT = THREE.RepeatWrapping;
+        wallTex.repeat.set(2, 1);
+        const wallMat = new THREE.MeshStandardMaterial({ map: wallTex, roughness: 0.35, metalness: 0.02 });
+
+        // Front Wall (Blackboard)
+        const frontWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
+        frontWall.position.set(0, roomH / 2, -roomL / 2);
+        frontWall.receiveShadow = true;
+        scene.add(frontWall);
+
+        // Back Wall
+        const backWall = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomH), wallMat);
+        backWall.position.set(0, roomH / 2, roomL / 2);
+        backWall.rotation.y = Math.PI;
+        scene.add(backWall);
+
+        // Left Wall
+        const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(roomL, roomH), wallMat);
+        leftWall.position.set(-roomW / 2, roomH / 2, 0);
+        leftWall.rotation.y = Math.PI / 2;
+        scene.add(leftWall);
+
+        // Right Wall (Windows)
+        const rightWall = new THREE.Mesh(new THREE.PlaneGeometry(roomL, roomH), wallMat);
+        rightWall.position.set(roomW / 2, roomH / 2, 0);
+        rightWall.rotation.y = -Math.PI / 2;
+        scene.add(rightWall);
+
+        // Ceiling
+        const ceilingMat = new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.7 });
+        const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(roomW, roomL), ceilingMat);
+        ceiling.position.set(0, roomH, 0);
+        ceiling.rotation.x = Math.PI / 2;
+        scene.add(ceiling);
+
+        // Windows on Right Wall
+        const winTex = new THREE.CanvasTexture(createWindowSkyCanvas());
+        const winMat = new THREE.MeshBasicMaterial({ map: winTex });
+        const winFrameMat = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.3 });
+
+        for (let i = -1; i <= 1; i++) {
+          const winGroup = new THREE.Group();
+          winGroup.position.set(roomW / 2 - 0.05, 2.4, i * 4.5);
+          winGroup.rotation.y = -Math.PI / 2;
+
+          const winMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.5, 2.2), winMat);
+          winGroup.add(winMesh);
+
+          const frameBox = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.3, 0.08), winFrameMat);
+          frameBox.position.z = -0.03;
+          winGroup.add(frameBox);
+          scene.add(winGroup);
+        }
+
+        // 3. Interactive Smart 3D Blackboard
+        renderBlackboardCanvas(state.blackboardData);
+        blackboardTexture = new THREE.CanvasTexture(blackboardCanvas);
+
+        const boardGroup = new THREE.Group();
+        boardGroup.position.set(0, 2.3, -roomL / 2 + 0.12);
+
+        const boardMesh = new THREE.Mesh(
+          new THREE.PlaneGeometry(8.4, 3.4),
+          new THREE.MeshStandardMaterial({ map: blackboardTexture, roughness: 0.6, metalness: 0.05 })
+        );
+        boardGroup.add(boardMesh);
+
+        // Golden Cedar Wooden Frame
+        const frameMat = new THREE.MeshStandardMaterial({ color: '#b45309', roughness: 0.35, metalness: 0.2 });
+        const topF = new THREE.Mesh(new THREE.BoxGeometry(8.72, 0.16, 0.1), frameMat);
+        topF.position.set(0, 1.78, 0.05);
+        boardGroup.add(topF);
+        const botF = new THREE.Mesh(new THREE.BoxGeometry(8.72, 0.16, 0.22), frameMat);
+        botF.position.set(0, -1.78, 0.11);
+        boardGroup.add(botF);
+        const leftF = new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.4, 0.1), frameMat);
+        leftF.position.set(-4.28, 0, 0.05);
+        boardGroup.add(leftF);
+        const rightF = new THREE.Mesh(new THREE.BoxGeometry(0.16, 3.4, 0.1), frameMat);
+        rightF.position.set(4.28, 0, 0.05);
+        boardGroup.add(rightF);
+        scene.add(boardGroup);
+
+        // 4. Teacher Podium & Desk
+        const teacherPlatform = new THREE.Mesh(
+          new THREE.BoxGeometry(10, 0.15, 3),
+          new THREE.MeshStandardMaterial({ map: floorTex, color: '#e2e8f0', roughness: 0.2 })
+        );
+        teacherPlatform.position.set(0, 0.075, -roomL / 2 + 2.5);
+        scene.add(teacherPlatform);
+
+        const deskGroup = new THREE.Group();
+        deskGroup.position.set(2.2, 0.15, -roomL / 2 + 3);
+
+        const deskTop = new THREE.Mesh(
+          new THREE.BoxGeometry(2.2, 0.08, 1.1),
+          new THREE.MeshStandardMaterial({ color: '#78350f', roughness: 0.3 })
+        );
+        deskTop.position.y = 0.85;
+        deskTop.castShadow = true;
+        deskGroup.add(deskTop);
+
+        // Atom Model on desk
+        const atomGroup = new THREE.Group();
+        atomGroup.position.set(-0.6, 1.12, 0);
+        const nucleus = new THREE.Mesh(
+          new THREE.SphereGeometry(0.06, 16, 16),
+          new THREE.MeshStandardMaterial({ color: '#ef4444', emissive: '#dc2626', emissiveIntensity: 0.3 })
+        );
+        atomGroup.add(nucleus);
+        const ringMat = new THREE.MeshStandardMaterial({ color: '#38bdf8', wireframe: true });
+        const ring1 = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.008, 8, 32), ringMat);
+        const ring2 = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.008, 8, 32), ringMat);
+        ring2.rotation.x = Math.PI / 3;
+        atomGroup.add(ring1);
+        atomGroup.add(ring2);
+        deskGroup.add(atomGroup);
+
+        // Newton's Cradle on desk
+        const pendulumGroup = new THREE.Group();
+        pendulumGroup.position.set(0.4, 0.9, 0);
+        const ballMat = new THREE.MeshStandardMaterial({ color: '#e2e8f0', metalness: 0.9, roughness: 0.1 });
+        balls = [];
+        for (let b = 0; b < 5; b++) {
+          const ball = new THREE.Mesh(new THREE.SphereGeometry(0.022, 16, 16), ballMat);
+          ball.position.set(b * 0.05 - 0.1, -0.08, 0);
+          pendulumGroup.add(ball);
+          balls.push(ball);
+        }
+        deskGroup.add(pendulumGroup);
+        scene.add(deskGroup);
+
+        // 5. Stylized 3D Teacher Avatar (عمر حسان عبره)
+        const teacherGroup = new THREE.Group();
+        teacherGroup.position.set(-1.6, 0.15, -roomL / 2 + 2.8);
+        teacherGroup.rotation.y = 0.2;
+
+        const suitMat = new THREE.MeshStandardMaterial({ color: '#1e3a8a', roughness: 0.6 });
+        const skinMat = new THREE.MeshStandardMaterial({ color: '#f5d0b0', roughness: 0.5 });
+        const tieMat = new THREE.MeshStandardMaterial({ color: '#dc2626', roughness: 0.4 });
+        const hairMat = new THREE.MeshStandardMaterial({ color: '#334155', roughness: 0.8 });
+
+        // Torso & Legs
+        const torso = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.72, 0.32), suitMat);
+        torso.position.set(0, 1.25, 0);
+        torso.castShadow = true;
+        teacherGroup.add(torso);
+
+        const tie = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.35, 0.02), tieMat);
+        tie.position.set(0, 1.32, 0.18);
+        teacherGroup.add(tie);
+
+        const leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.9), suitMat);
+        leftLeg.position.set(-0.16, 0.45, 0);
+        teacherGroup.add(leftLeg);
+        const rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.9), suitMat);
+        rightLeg.position.set(0.16, 0.45, 0);
+        teacherGroup.add(rightLeg);
+
+        // Head Group
+        const headGroup = new THREE.Group();
+        headGroup.position.set(0, 1.72, 0);
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.19, 24, 24), skinMat);
+        head.scale.set(1, 1.15, 1.05);
+        headGroup.add(head);
+
+        const hair = new THREE.Mesh(new THREE.SphereGeometry(0.205, 20, 20), hairMat);
+        hair.position.set(0, 0.05, -0.03);
+        headGroup.add(hair);
+
+        // Glasses
+        const glassesMat = new THREE.MeshStandardMaterial({ color: '#ca8a04', metalness: 0.8 });
+        const gL = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.006, 8, 24), glassesMat);
+        gL.position.set(-0.07, 0.02, 0.19);
+        headGroup.add(gL);
+        const gR = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.006, 8, 24), glassesMat);
+        gR.position.set(0.07, 0.02, 0.19);
+        headGroup.add(gR);
+
+        // Animated Jaw
+        const jaw = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.03, 0.04), new THREE.MeshStandardMaterial({ color: '#991b1b' }));
+        jaw.position.set(0, -0.1, 0.18);
+        headGroup.add(jaw);
+
+        // Professor 3D Badge
+        const bCanvas = document.createElement('canvas');
+        bCanvas.width = 512; bCanvas.height = 160;
+        const bCtx = bCanvas.getContext('2d');
+        bCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        if (bCtx.roundRect) bCtx.roundRect(10, 10, 492, 140, 24);
+        else bCtx.rect(10, 10, 492, 140);
+        bCtx.fill();
+        bCtx.strokeStyle = '#f59e0b'; bCtx.lineWidth = 6; bCtx.stroke();
+        bCtx.fillStyle = '#fff'; bCtx.font = 'bold 44px sans-serif'; bCtx.textAlign = 'center';
+        bCtx.fillText('عمر حسان عبره ⚛️', 256, 75);
+        bCtx.fillStyle = '#fde68a'; bCtx.font = '26px sans-serif';
+        bCtx.fillText('مدرس مساعد فيزياء بالذكاء الاصطناعي', 256, 125);
+
+        const bTex = new THREE.CanvasTexture(bCanvas);
+        const bMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.3), new THREE.MeshBasicMaterial({ map: bTex, transparent: true }));
+        bMesh.position.set(0, 0.5, 0);
+        headGroup.add(bMesh);
+
+        teacherGroup.add(headGroup);
+
+        // Arms & Pointer
+        const leftArmGroup = new THREE.Group();
+        leftArmGroup.position.set(-0.35, 1.55, 0);
+        const lArm = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.4), suitMat);
+        lArm.position.y = -0.2;
+        leftArmGroup.add(lArm);
+        teacherGroup.add(leftArmGroup);
+
+        const rightArmGroup = new THREE.Group();
+        rightArmGroup.position.set(0.35, 1.55, 0);
+        const rArm = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.07, 0.4), suitMat);
+        rArm.position.y = -0.2;
+        rightArmGroup.add(rArm);
+
+        const pointer = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.012, 0.018, 0.9),
+          new THREE.MeshStandardMaterial({ color: '#f59e0b', metalness: 0.8 })
+        );
+        pointer.position.set(0, -0.6, 0.2);
+        pointer.rotation.x = Math.PI / 4;
+        rightArmGroup.add(pointer);
+        teacherGroup.add(rightArmGroup);
+
+        scene.add(teacherGroup);
+
+        avatarRefs = {
+          root: teacherGroup,
+          head: headGroup,
+          rightArm: rightArmGroup,
+          leftArm: leftArmGroup,
+          jaw,
+          atomGroup
+        };
+
+        // 6. Student Desks (3 rows x 3 cols)
+        studentDesksGroup = new THREE.Group();
+        const rowsZ = [0.2, 2.6, 5.0];
+        const colsX = [-3.6, 0, 3.6];
+
+        rowsZ.forEach(z => {
+          colsX.forEach(x => {
+            const unit = new THREE.Group();
+            unit.position.set(x, 0, z);
+
+            const sDesk = new THREE.Mesh(
+              new THREE.BoxGeometry(1.9, 0.06, 0.75),
+              new THREE.MeshStandardMaterial({ color: '#9a3412', roughness: 0.4 })
+            );
+            sDesk.position.set(0, 0.76, 0);
+            sDesk.castShadow = true;
+            unit.add(sDesk);
+
+            [-0.45, 0.45].forEach(cx => {
+              const chair = new THREE.Mesh(
+                new THREE.BoxGeometry(0.45, 0.04, 0.42),
+                new THREE.MeshStandardMaterial({ color: '#1e293b' })
+              );
+              chair.position.set(cx, 0.46, 0.65);
+              unit.add(chair);
+            });
+
+            studentDesksGroup.add(unit);
+          });
+        });
+        scene.add(studentDesksGroup);
+
+        // Window resize
+        window.addEventListener('resize', onWindowResize);
+        if (window.ResizeObserver && container) {
+          const ro = new ResizeObserver(() => {
+            onWindowResize();
+          });
+          ro.observe(container);
+        }
+
+        // Click on 3D scene / teacher
+        container.addEventListener('click', (e) => {
+          // If clicked near teacher
+          if (e.clientX < window.innerWidth * 0.4) {
+            applyCameraPreset('teacher_close');
+            toggleTeacherWelcomeSpeech();
+          }
+        });
+
+        // Mouse Drag to Look Around
+        let isMouseDown = false;
+        let lastMouseX = 0;
+        container.addEventListener('mousedown', (e) => {
+          isMouseDown = true;
+          lastMouseX = e.clientX;
+        });
+        window.addEventListener('mouseup', () => { isMouseDown = false; });
+        window.addEventListener('mousemove', (e) => {
+          if (!isMouseDown) return;
+          const deltaX = e.clientX - lastMouseX;
+          lastMouseX = e.clientX;
+          visitorPos.targetRotY += deltaX * 0.005;
+        });
+
+        // Touch drag for mobile
+        let lastTouchX = 0;
+        container.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 1) lastTouchX = e.touches[0].clientX;
+        }, { passive: true });
+        container.addEventListener('touchmove', (e) => {
+          if (e.touches.length === 1) {
+            const deltaX = e.touches[0].clientX - lastTouchX;
+            lastTouchX = e.touches[0].clientX;
+            visitorPos.targetRotY += deltaX * 0.006;
+          }
+        }, { passive: true });
+
+        // Render loop
+        animateLoop();
+      }
+
+      function onWindowResize() {
+        const container = document.getElementById('classroom-canvas-container');
+        if (!container || !camera || !renderer) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      }
+
+      // Animation loop
+      const clock = new THREE.Clock();
+      function animateLoop() {
+        requestAnimationFrame(animateLoop);
+        const delta = clock.getDelta();
+        const time = clock.getElapsedTime();
+
+        // 1. Visitor Movement Physics
+        const speed = 4.2 * delta;
+        const rotSpeed = 2.2 * delta;
+
+        if (state.visitorAction.turnLeft) visitorPos.targetRotY += rotSpeed;
+        if (state.visitorAction.turnRight) visitorPos.targetRotY -= rotSpeed;
+
+        const fwdX = -Math.sin(visitorPos.targetRotY);
+        const fwdZ = -Math.cos(visitorPos.targetRotY);
+        const sideX = Math.cos(visitorPos.targetRotY);
+        const sideZ = -Math.sin(visitorPos.targetRotY);
+
+        if (state.visitorAction.forward) {
+          visitorPos.targetX += fwdX * speed;
+          visitorPos.targetZ += fwdZ * speed;
+        }
+        if (state.visitorAction.backward) {
+          visitorPos.targetX -= fwdX * speed;
+          visitorPos.targetZ -= fwdZ * speed;
+        }
+        if (state.visitorAction.left) {
+          visitorPos.targetX -= sideX * speed;
+          visitorPos.targetZ -= sideZ * speed;
+        }
+        if (state.visitorAction.right) {
+          visitorPos.targetX += sideX * speed;
+          visitorPos.targetZ += sideZ * speed;
+        }
+
+        // Room Bounds clamp
+        visitorPos.targetX = THREE.MathUtils.clamp(visitorPos.targetX, -5.8, 5.8);
+        visitorPos.targetZ = THREE.MathUtils.clamp(visitorPos.targetZ, -7.2, 7.5);
+
+        // Smooth Lerp
+        visitorPos.x = THREE.MathUtils.lerp(visitorPos.x, visitorPos.targetX, 0.12);
+        visitorPos.z = THREE.MathUtils.lerp(visitorPos.z, visitorPos.targetZ, 0.12);
+        visitorPos.rotY = THREE.MathUtils.lerp(visitorPos.rotY, visitorPos.targetRotY, 0.12);
+
+        camera.position.x = visitorPos.x;
+        camera.position.y = visitorPos.y;
+        camera.position.z = visitorPos.z;
+        camera.rotation.y = visitorPos.rotY;
+
+        // 2. Animate Props
+        if (avatarRefs.atomGroup) {
+          avatarRefs.atomGroup.rotation.y += delta * 1.5;
+        }
+        if (balls.length === 5) {
+          const swing = Math.sin(time * 3.5);
+          if (swing > 0) {
+            balls[0].position.x = -0.1 - swing * 0.08;
+            balls[4].position.x = 0.1;
+          } else {
+            balls[4].position.x = 0.1 - swing * 0.08;
+            balls[0].position.x = -0.1;
+          }
+        }
+
+        // 3. Animate Teacher Omar Hassan Abra
+        if (avatarRefs.root) {
+          avatarRefs.root.position.y = 0.15 + Math.sin(time * 1.8) * 0.012;
+
+          // Mouth Jaw sync
+          if (state.isTeacherTalking) {
+            avatarRefs.jaw.scale.y = 1 + Math.abs(Math.sin(time * 14)) * 2.2;
+            avatarRefs.head.rotation.x = Math.sin(time * 4) * 0.06;
+          } else {
+            avatarRefs.jaw.scale.y = 1;
+            avatarRefs.head.rotation.x = Math.sin(time * 1.2) * 0.02;
+          }
+
+          // Gesture anim
+          const rArm = avatarRefs.rightArm;
+          const lArm = avatarRefs.leftArm;
+          if (state.teacherGesture === 'pointing_board') {
+            rArm.rotation.x = THREE.MathUtils.lerp(rArm.rotation.x, -1.8, 0.1);
+            rArm.rotation.z = THREE.MathUtils.lerp(rArm.rotation.z, -0.6, 0.1);
+          } else if (state.teacherGesture === 'explaining') {
+            rArm.rotation.x = THREE.MathUtils.lerp(rArm.rotation.x, -0.9 + Math.sin(time * 4) * 0.25, 0.1);
+            lArm.rotation.x = THREE.MathUtils.lerp(lArm.rotation.x, -0.8 + Math.cos(time * 3.5) * 0.25, 0.1);
+          } else if (state.teacherGesture === 'welcoming') {
+            rArm.rotation.x = THREE.MathUtils.lerp(rArm.rotation.x, -0.6, 0.1);
+            rArm.rotation.z = THREE.MathUtils.lerp(rArm.rotation.z, -0.9, 0.1);
+            lArm.rotation.x = THREE.MathUtils.lerp(lArm.rotation.x, -0.6, 0.1);
+            lArm.rotation.z = THREE.MathUtils.lerp(lArm.rotation.z, 0.9, 0.1);
+          } else if (state.teacherGesture === 'writing') {
+            rArm.rotation.x = THREE.MathUtils.lerp(rArm.rotation.x, -1.4 + Math.sin(time * 8) * 0.15, 0.1);
+          } else {
+            rArm.rotation.x = THREE.MathUtils.lerp(rArm.rotation.x, 0.1, 0.1);
+            lArm.rotation.x = THREE.MathUtils.lerp(lArm.rotation.x, 0.1, 0.1);
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+
+      // ==========================================
+      // 7. CAMERA PRESETS & KEYBOARD CONTROLS
+      // ==========================================
+      function applyCameraPreset(preset) {
+        state.cameraPreset = preset;
+        document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = document.getElementById(`preset-${preset}`);
+        if (activeBtn) activeBtn.classList.add('active');
+
+        switch (preset) {
+          case 'front_seat':
+            visitorPos.targetX = 0; visitorPos.targetZ = 1.8; visitorPos.targetRotY = 0;
+            break;
+          case 'teacher_close':
+            visitorPos.targetX = -1.8; visitorPos.targetZ = -3.2; visitorPos.targetRotY = 0.25;
+            break;
+          case 'blackboard':
+            visitorPos.targetX = 0; visitorPos.targetZ = -2.8; visitorPos.targetRotY = 0;
+            break;
+          case 'default':
+          default:
+            visitorPos.targetX = 0; visitorPos.targetZ = 4.8; visitorPos.targetRotY = 0;
+            break;
+        }
+      }
+
+      // D-Pad Touch / Mouse Bindings
+      function setupDpadHandlers() {
+        const bindBtn = (id, key) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const start = (e) => { e.preventDefault(); state.visitorAction[key] = true; el.classList.add('pressed'); };
+          const end = (e) => { e.preventDefault(); state.visitorAction[key] = false; el.classList.remove('pressed'); };
+          el.addEventListener('mousedown', start);
+          el.addEventListener('mouseup', end);
+          el.addEventListener('mouseleave', end);
+          el.addEventListener('touchstart', start, { passive: false });
+          el.addEventListener('touchend', end, { passive: false });
+        };
+
+        bindBtn('btn-move-fwd', 'forward');
+        bindBtn('btn-move-back', 'backward');
+        bindBtn('btn-move-left', 'left');
+        bindBtn('btn-move-right', 'right');
+        bindBtn('btn-rot-left', 'turnLeft');
+        bindBtn('btn-rot-right', 'turnRight');
+
+        // Keyboard keys listener
+        window.addEventListener('keydown', (e) => {
+          if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+          switch(e.key.toLowerCase()) {
+            case 'w': case 'arrowup': state.visitorAction.forward = true; break;
+            case 's': case 'arrowdown': state.visitorAction.backward = true; break;
+            case 'a': case 'arrowleft': state.visitorAction.left = true; break;
+            case 'd': case 'arrowright': state.visitorAction.right = true; break;
+            case 'q': state.visitorAction.turnLeft = true; break;
+            case 'e': state.visitorAction.turnRight = true; break;
+          }
+        });
+        window.addEventListener('keyup', (e) => {
+          if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+          switch(e.key.toLowerCase()) {
+            case 'w': case 'arrowup': state.visitorAction.forward = false; break;
+            case 's': case 'arrowdown': state.visitorAction.backward = false; break;
+            case 'a': case 'arrowleft': state.visitorAction.left = false; break;
+            case 'd': case 'arrowright': state.visitorAction.right = false; break;
+            case 'q': state.visitorAction.turnLeft = false; break;
+            case 'e': state.visitorAction.turnRight = false; break;
+          }
+        });
+      }
+
+      // ==========================================
+      // 8. CHAT ENGINE & STANDALONE PHYSICS AI
+      // ==========================================
+      function switchGrade(grade) {
+        state.currentGrade = grade;
+        document.querySelectorAll('.grade-pill').forEach(btn => {
+          if (btn.dataset.grade === grade) btn.classList.add('active');
+          else btn.classList.remove('active');
+        });
+
+        // Set default blackboard topic for this grade
+        if (grade === 'first') {
+          updateBlackboardState({
+            title: 'قوانين نيوتن في الحركة والميكانيكا',
+            points: [
+              '• قانون نيوتن الأول: الجسم الساكن يبقى ساكناً مالم تؤثر عليه قوة.',
+              '• قانون نيوتن الثاني: القوة المحصلة = الكتلة × التسارع (F = m · a).',
+              '• قانون نيوتن الثالث: لكل فعل رد فعل مساوٍ له ومضاد في الاتجاه.',
+              '• الشغل وطاقة الحركة: W = F · d · cos(θ) و KE = ½ m v².'
+            ],
+            formula: 'F = m · a  |  KE = ½ · m · v²',
+            grade: 'first'
+          });
+        } else if (grade === 'second') {
+          updateBlackboardState({
+            title: 'الموائع والضوء والموجات والحرارة',
+            points: [
+              '• قاعدة باسكال: الضغط ينتقل بتمامه في السوائل المحصورة.',
+              '• المكبس الهيدروليكي: وسيلة لمضاعفة القوة F₂ / F₁ = A₂ / A₁.',
+              '• قانون سنيل للبصريات: n₁ · sin(θ₁) = n₂ · sin(θ₂).',
+              '• سرعة الموجة: v = λ · f (الطول الموجي × التردد بالهرتز).'
+            ],
+            formula: 'n₁ · sin(θ₁) = n₂ · sin(θ₂)  |  P = ρ · g · h',
+            grade: 'second'
+          });
+        } else {
+          updateBlackboardState({
+            title: 'الكهرومغناطيسية وفيزياء الكم والحديثة',
+            points: [
+              '• قانون أوم للدائرة المغلقة: I = VB / (R_eq + r).',
+              '• قانون كيرشوف: حفظ الشحنة عند العقد وحفظ الطاقة عبر المسارات.',
+              '• قانون فاراداي للحث وقاعدة لنز: emf = -N · (ΔΦ / Δt).',
+              '• الظاهرة الكهروضوئية لآينشتاين: E = h · ν = W + KE_max.'
+            ],
+            formula: 'emf = -N · (ΔΦ / Δt)  |  E = h · ν',
+            grade: 'third'
+          });
+        }
+
+        renderQuickTopics();
+        playSoundChime('welcome');
+      }
+
+      function renderQuickTopics() {
+        const container = document.getElementById('quick-topics-box');
+        container.innerHTML = '';
+        const topics = PHYSICS_TOPICS[state.currentGrade].topics;
+        topics.forEach(t => {
+          const pill = document.createElement('button');
+          pill.className = 'topic-pill';
+          pill.textContent = t;
+          pill.onclick = () => {
+            processStudentQuery(t);
+          };
+          container.appendChild(pill);
+        });
+      }
+
+      function updateBlackboardState(newData) {
+        state.blackboardData = { ...newData };
+        renderBlackboardCanvas(state.blackboardData);
+        playSoundChime('board_update');
+
+        // Show floating announcement banner
+        const banner = document.getElementById('board-announcement-banner');
+        document.getElementById('announcement-title').textContent = newData.title;
+        banner.classList.add('visible');
+        setTimeout(() => {
+          banner.classList.remove('visible');
+        }, 5000);
+      }
+
+      function handleChatSubmit(e) {
+        e.preventDefault();
+        const input = document.getElementById('chat-input-field');
+        const query = input.value.trim();
+        if (!query) return;
+        input.value = '';
+        processStudentQuery(query);
+      }
+
+      function processStudentQuery(query) {
+        appendChatMessage('user', query);
+
+        // Search in Curated Knowledge Base
+        const lower = query.toLowerCase();
+        let matched = null;
+        for (const item of CURATED_PHYSICS_KB) {
+          if (item.match.some(m => lower.includes(m))) {
+            matched = item;
+            break;
+          }
+        }
+
+        // Fallback intelligent response
+        if (!matched) {
+          const gradeTitle = PHYSICS_TOPICS[state.currentGrade].name;
+          matched = {
+            title: `مفهوم: ${query.slice(0, 30)}`,
+            formula: state.blackboardData.formula,
+            points: [
+              `• المحور المستفسر عنه: ${query.slice(0, 36)}.`,
+              `• المستوى الدراسي: ${gradeTitle}.`,
+              '• القاعدة الذهبية: كتابة القانون بدقة والتعويض بالوحدات الدولية (SI).',
+              '• نصيحة المعلم: ارسم مخططات الجسم الحر وتدرب على المسائل.'
+            ],
+            reply: `سؤال رائع يا بني عن "${query}"! في مقرر ${gradeTitle}، نحرص على الربط الوثيق بين الفهم الرياضي والتجربة المعملية. تفضل بمطالعة السبورة الذكية فقد دونت لك ملخص هذا المفهوم الفيزيائي!`,
+            gesture: 'explaining'
+          };
+        }
+
+        // Apply Teacher Action & Gesture
+        state.teacherGesture = matched.gesture || 'pointing_board';
+        updateBlackboardState({
+          title: matched.title,
+          points: matched.points,
+          formula: matched.formula,
+          grade: state.currentGrade
+        });
+
+        setTimeout(() => {
+          appendChatMessage('teacher', matched.reply, {
+            title: matched.title,
+            formula: matched.formula
+          });
+          speakTeacherText(matched.reply);
+        }, 300);
+      }
+
+      function appendChatMessage(role, text, meta) {
+        state.chatHistory.push({ role, text, meta });
+        const container = document.getElementById('chat-messages-container');
+
+        const row = document.createElement('div');
+        row.className = `message-row ${role}`;
+
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble';
+        bubble.textContent = text;
+        row.appendChild(bubble);
+
+        if (role === 'teacher') {
+          const actions = document.createElement('div');
+          actions.className = 'message-actions';
+
+          const listenBtn = document.createElement('button');
+          listenBtn.className = 'msg-action-btn';
+          listenBtn.innerHTML = '🔊 إعادة الاستماع';
+          listenBtn.onclick = () => speakTeacherText(text);
+          actions.appendChild(listenBtn);
+
+          const boardBtn = document.createElement('button');
+          boardBtn.className = 'msg-action-btn';
+          boardBtn.innerHTML = '📋 فحص السبورة';
+          boardBtn.onclick = () => openBoardModal();
+          actions.appendChild(boardBtn);
+
+          row.appendChild(actions);
+        }
+
+        container.appendChild(row);
+        container.scrollTop = container.scrollHeight;
+      }
+
+      // ==========================================
+      // 9. MODALS & HUD INTERACTION
+      // ==========================================
+      function openBoardModal() {
+        document.getElementById('blackboard-inspection-modal').classList.add('open');
+      }
+      function closeBoardModal() {
+        document.getElementById('blackboard-inspection-modal').classList.remove('open');
+      }
+
+      function copyFormulaToClipboard() {
+        navigator.clipboard.writeText(state.blackboardData.formula).then(() => {
+          alert('تم نسخ القانون الفيزيائي إلى الحافظة بنجاح!');
+        }).catch(() => {});
+      }
+
+      function togglePanelCollapse() {
+        state.isPanelCollapsed = !state.isPanelCollapsed;
+        const panel = document.getElementById('teacher-dialog-panel');
+        if (state.isPanelCollapsed) {
+          panel.classList.add('collapsed');
+          document.getElementById('quick-topics-box').style.display = 'none';
+          document.getElementById('chat-messages-container').style.display = 'none';
+        } else {
+          panel.classList.remove('collapsed');
+          document.getElementById('quick-topics-box').style.display = 'flex';
+          document.getElementById('chat-messages-container').style.display = 'flex';
+        }
+      }
+
+      function toggleImmersiveView() {
+        state.isImmersiveView = !state.isImmersiveView;
+        const sidebar = document.getElementById('docking-sidebar');
+        const header = document.getElementById('classroom-top-header');
+        const toggleBtn = document.getElementById('immersive-toggle-btn');
+        const floatingBtn = document.getElementById('floating-open-dock-btn');
+
+        if (state.isImmersiveView) {
+          if (sidebar) sidebar.classList.add('collapsed');
+          if (header) header.style.display = 'none';
+          if (toggleBtn) {
+            toggleBtn.classList.add('active');
+            toggleBtn.title = 'إظهار الواجهات';
+          }
+          if (floatingBtn) floatingBtn.classList.add('visible');
+        } else {
+          if (sidebar) sidebar.classList.remove('collapsed');
+          if (header) header.style.display = 'flex';
+          if (toggleBtn) {
+            toggleBtn.classList.remove('active');
+            toggleBtn.title = 'وضع الرؤية الكاملة';
+          }
+          if (floatingBtn) floatingBtn.classList.remove('visible');
+        }
+        setTimeout(() => {
+          if (typeof onWindowResize === 'function') onWindowResize();
+        }, 320);
+      }
+
+      // ==========================================
+      // SIDEBAR & DOCKING CONTROLS (NON-OVERLAPPING TABS)
+      // ==========================================
+      function switchSidebarTab(tabName) {
+        const chatTab = document.getElementById('teacher-dialog-panel');
+        const navTab = document.getElementById('visitor-navigation-overlay');
+        const chatBtn = document.getElementById('tab-btn-chat');
+        const navBtn = document.getElementById('tab-btn-nav');
+        
+        if (tabName === 'chat') {
+          if (chatTab) chatTab.classList.add('active-tab');
+          if (navTab) navTab.classList.remove('active-tab');
+          if (chatBtn) chatBtn.classList.add('active');
+          if (navBtn) navBtn.classList.remove('active');
+        } else {
+          if (chatTab) chatTab.classList.remove('active-tab');
+          if (navTab) navTab.classList.add('active-tab');
+          if (chatBtn) chatBtn.classList.remove('active');
+          if (navBtn) navBtn.classList.add('active');
+        }
+      }
+
+      function toggleSidebar(forceState) {
+        const sidebar = document.getElementById('docking-sidebar');
+        const toggleBtn = document.getElementById('sidebar-toggle-btn');
+        const floatingBtn = document.getElementById('floating-open-dock-btn');
+        
+        if (!sidebar) return;
+        
+        let willBeCollapsed;
+        if (typeof forceState === 'boolean') {
+          willBeCollapsed = !forceState;
+        } else {
+          willBeCollapsed = !sidebar.classList.contains('collapsed');
+        }
+        
+        if (willBeCollapsed) {
+          sidebar.classList.add('collapsed');
+          if (toggleBtn) toggleBtn.classList.remove('active');
+          if (floatingBtn) floatingBtn.classList.add('visible');
+        } else {
+          sidebar.classList.remove('collapsed');
+          if (toggleBtn) toggleBtn.classList.add('active');
+          if (floatingBtn) floatingBtn.classList.remove('visible');
+        }
+        
+        // Trigger Three.js resize to immediately fill newly available viewport width
+        setTimeout(() => {
+          if (typeof onWindowResize === 'function') onWindowResize();
+        }, 320);
+      }
+
+
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+
+      // Single-click Standalone HTML Exporter
+      function downloadStandaloneApp() {
+        const htmlContent = '<!doctype html>\n' + document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'physics-classroom-standalone.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      }
+
+      // ==========================================
+      // 10. INITIALIZATION
+      // ==========================================
+      window.addEventListener('DOMContentLoaded', () => {
+        init3DClassroom();
+        setupDpadHandlers();
+        renderQuickTopics();
+
+        // Welcome greeting in chat log
+        appendChatMessage('teacher', 'أهلاً بك يا بطل الفيزياء في الصف الافتراضي ثلاثي الأبعاد! أنا أستاذك عمر حسان عبره، تفضل بسؤالي عبر الكتابة أو المايكروفون، وسأشرح لك وأدوّن القوانين على السبورة الذكية أمامك مباشرة.');
+      });
+    </script>
+  
+
+</body></html>
